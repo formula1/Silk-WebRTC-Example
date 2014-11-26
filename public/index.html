@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+<head>
+  <script src="/bc/jquery" ></script>
+  <script src="/bc/eventEmitter" ></script>
+  <script src="/bc/rsvp" ></script>
+  <script src="/abstract/StreamPromise.js" ></script>
+  <script src="/abstract/MessageWriter.js"></script>
+  <script src="/abstract/MessageRouter.js"></script>
+  <script src="/abstract/MessageDuplex.js"></script>
+  <script src="/window/WindowAbstract.js" ></script>
+  <script src="/window/Window2Server_com.js" ></script>
+  <script src="/utils/crossbrowser/WebRTCadapter.js"></script>
+  <script src="/network/NetworkHost.js"></script>
+  <script src="/network/NetworkUser.js"></script>
+  <script type="text/javascript">
+    jQuery(function($){
+      var net = new NetworkHost();
+      net.connect({"not":"important here"});
+			var peer;
+
+      net.on("userlist",function(list){
+        console.log(list);
+        var ue = $("#userlist");
+				ue.empty();
+        for(var i in list){
+          ue.append("<li class='user' id='"+i+"'><a href='#'>"+JSON.stringify(list[i])+"</a></li>");
+        }
+      });
+      $(document).on("click",".user a",function(e){
+				e.preventDefault();
+				console.log("offering");
+        var id = $(this).parent().attr("id");
+        net.offer(id).catch(console.log.bind(console, "error: "));
+      });
+      net.on("offer",function(message){
+        net.offerAccept(message).catch(console.log.bind(console, "error: "));
+      });
+			net.on("ready",function(connection){
+					peer = connection;
+					peer.add("chat", function(val){
+						$("#chat").prepend("<li>"+val+"</li>");
+					});
+			});
+			$("#form").submit(function(e){
+				e.preventDefault();
+				if(!peer) return alert("Peer Connection is not ready yet");
+				var tx = $(this).find("textarea");
+				peer.trigger("chat",tx.val());
+				$("#chat").prepend("<li>"+tx.val()+"</li>");
+				tx.val("");
+			});
+    });
+  </script>
+	<style>
+		body{text-align:center;}
+		body>*{width:500px;margin:5px auto;}
+		form>button[type=submit]{display:block;width:100%;}
+	</style>
+</head>
+<body>
+<ul id="userlist"></ul>
+<ul id="chat"></ul>
+<form id="form" action="#">
+	<textarea></textarea>
+	<button type="submit">Submit</button>
+</form>
+</body>
+</html>
