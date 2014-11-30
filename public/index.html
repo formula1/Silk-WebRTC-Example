@@ -25,13 +25,19 @@
         net.offer(id).catch(console.log.bind(console, "error: "));
       });
       net.on("offer",function(message){
+        console.log("got offer");
         net.offerAccept(message).catch(console.log.bind(console, "error: "));
       });
 			net.on("ready",function(connection){
+        console.log(connection)
+        console.log(connection.add)
+        console.log(typeof connection.add)
+
 					peer = connection;
 					peer.add("chat", function(val){
 						$("#chat").prepend("<li>"+val+"</li>");
 					});
+          $("button").css("background-color","#0F0").text("Speak!");
 			});
 			$("#form").submit(function(e){
 				e.preventDefault();
@@ -54,7 +60,7 @@
 <ul id="chat"></ul>
 <form id="form" action="#">
 	<textarea></textarea>
-	<button type="submit">Submit</button>
+	<button style="background-color:#888" type="submit">Wait</button>
 </form>
 </body>
 </html>
