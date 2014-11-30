@@ -6,15 +6,21 @@ message.id = i;
 RTC.emit(i,message)
 */
 
-methods.add({
-  "RTC-user": UserEnter
-})
+if(typeof ForkRouter == "undefined"){
+  methods.add({
+    "WebRTC-Example-RTC-user": UserEnter
+  })
+}else{
+  methods.add({
+    "RTC-user": UserEnter
+  })
+}
 
 function UserEnter(message,call_ob,next){
   if(call_ob.id in users){
     return Command(message,users[call_ob.id]);
   }
-  call_ob.user.on("close", function(){
+  call_ob.ws.on("close", function(){
     UserLeave(call_ob.id);
   })
   users[call_ob.id] = {

@@ -5,5 +5,9 @@
   "icon": "icon.png",
   "bower_dependencies":{
     "jquery": "latest"
-  }
+  },
+  "running": false,
+  "minimized": true,
+  "zIndex": 0
+  
 }
